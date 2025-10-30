@@ -77,8 +77,18 @@ fun GradientHeader(
 }
 
 @Composable
-fun GradientButton(text: String, enabled: Boolean = true, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val gradient = Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))
+fun GradientButton(
+    text: String,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val gradient = Brush.horizontalGradient(
+        listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.secondary
+        )
+    )
     Box(
         modifier
             .clip(RoundedCornerShape(16.dp))
@@ -105,7 +115,12 @@ fun SegmentedTabs(options: List<String>, selectedIndex: Int, onSelect: (Int) -> 
     ) {
         options.forEachIndexed { i, label ->
             val selected = i == selectedIndex
-            val bg = if (selected) Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)) else null
+            val bg = if (selected) Brush.horizontalGradient(
+                listOf(
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.secondary
+                )
+            ) else null
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -115,7 +130,10 @@ fun SegmentedTabs(options: List<String>, selectedIndex: Int, onSelect: (Int) -> 
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(label, color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    label,
+                    color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -123,8 +141,16 @@ fun SegmentedTabs(options: List<String>, selectedIndex: Int, onSelect: (Int) -> 
 
 @Composable
 fun BadgeChip(text: String) {
-    Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 1.dp, color = MaterialTheme.colorScheme.primaryContainer) {
-        Text(text, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        tonalElevation = 1.dp,
+        color = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Text(
+            text,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }
 
@@ -134,8 +160,16 @@ fun StatCard(title: String, value: String, icon: @Composable (() -> Unit)? = nul
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             icon?.invoke()
             Column(Modifier.padding(start = 8.dp)) {
-                Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(
+                    title,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    value,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -152,7 +186,14 @@ fun ScaffoldApp(
 ) {
     val count = notifications.collectAsState(initial = 0).value
     Scaffold(
-        topBar = { GradientHeader(title = "WTC Association", badgeCount = count, onNotifications = onNotificationClick, onLogout = onLogout) },
+        topBar = {
+            GradientHeader(
+                title = "WTC Association",
+                badgeCount = count,
+                onNotifications = onNotificationClick,
+                onLogout = onLogout
+            )
+        },
         bottomBar = { BottomBar(navController = navController, visibleTabs = visibleTabs) }
     ) { inner -> Box(Modifier.padding(inner)) { content() } }
 }
@@ -165,27 +206,51 @@ fun BottomBar(navController: NavHostController) {
         val route = entry?.destination?.route
         NavigationBarItem(
             selected = route == Tab.Dashboard.route,
-            onClick = { navController.navigate(Tab.Dashboard.route) },
-            icon = { Icon(Icons.Default.Dashboard, contentDescription = null) },
-            label = { Text("Dashboard") }
+            onClick = {
+                navController.navigate(Tab.Dashboard.route)
+            },
+            icon = {
+                Icon(Icons.Default.Dashboard, contentDescription = null)
+            },
+            label = {
+                Text("Dashboard")
+            }
         )
         NavigationBarItem(
             selected = route == Tab.Chat.route,
-            onClick = { navController.navigate(Tab.Chat.route) },
-            icon = { Icon(Icons.Default.Chat, contentDescription = null) },
-            label = { Text("Chat") }
+            onClick = {
+                navController.navigate(Tab.Chat.route)
+                      },
+            icon = {
+                Icon(Icons.Default.Chat, contentDescription = null)
+                   },
+            label = {
+                Text("Chat")
+            }
         )
         NavigationBarItem(
             selected = route == Tab.CRM.route,
-            onClick = { navController.navigate(Tab.CRM.route) },
-            icon = { Icon(Icons.Default.People, contentDescription = null) },
-            label = { Text("Clientes") }
+            onClick = {
+                navController.navigate(Tab.CRM.route)
+            },
+            icon = {
+                Icon(Icons.Default.People, contentDescription = null)
+            },
+            label = {
+                Text("Clientes")
+            }
         )
         NavigationBarItem(
             selected = route == Tab.Campaigns.route,
-            onClick = { navController.navigate(Tab.Campaigns.route) },
-            icon = { Icon(Icons.Default.Campaign, contentDescription = null) },
-            label = { Text("Campanhas") }
+            onClick = {
+                navController.navigate(Tab.Campaigns.route)
+            },
+            icon = {
+                Icon(Icons.Default.Campaign, contentDescription = null)
+            },
+            label = {
+                Text("Campanhas")
+            }
         )
     }
 }

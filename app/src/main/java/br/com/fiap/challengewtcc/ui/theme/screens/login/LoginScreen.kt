@@ -126,7 +126,7 @@ fun LoginScreen(
 }
 
 @Composable
-private fun RowScope.RoleButton( // 👈 adiciona RowScope aqui
+private fun RowScope.RoleButton(
     text: String,
     selected: Boolean,
     gradient: Brush,
@@ -134,7 +134,7 @@ private fun RowScope.RoleButton( // 👈 adiciona RowScope aqui
 ) {
     Box(
         modifier = Modifier
-            .weight(1f) // agora funciona!
+            .weight(1f)
             .clip(RoundedCornerShape(12.dp))
             .background(
                 if (selected) gradient
