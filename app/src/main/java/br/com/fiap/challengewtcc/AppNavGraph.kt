@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,6 +57,8 @@ fun AppNavGraph(rootNavController: NavHostController = rememberNavController()) 
 
 @Composable
 private fun Shell() {
+    val rootNav = rememberNavController()
+    val authVm: AuthViewModel = viewModel()
     val tabNav = rememberNavController()
     val notifVm: NotificationViewModel = viewModel()
     val chatVm: ChatViewModel = viewModel()
@@ -63,34 +66,27 @@ private fun Shell() {
     val campVm: CampaignViewModel = viewModel()
     val dashVm: DashboardViewModel = viewModel()
     val usersVm: UserViewModel = viewModel()
-    var showSheet by remember { mutableStateOf(false) }
+    var showSheet by rememberSaveable { mutableStateOf(false) }
 
     ScaffoldApp(
         notifications = notifVm.notificationsCount,
         onNotificationClick = { showSheet = true },
+        onLogout = {
+            authVm.logout()
+            rootNav.navigate(Screen.Login.route) {
+                popUpTo(0)
+            }
+        },
         navController = tabNav
-
     ) {
         Box(Modifier.fillMaxSize()) {
             NavHost(tabNav, startDestination = Tab.Dashboard.route) {
-                composable(Tab.Dashboard.route) {
-                    DashboardScreen(dashVm, usersVm)
-                }
-                composable(Tab.Chat.route) {
-                    ChatScreen(chatVm)
-                }
-                composable(Tab.CRM.route) {
-                    CRMScreen(crmVm)
-                }
-                composable(Tab.Campaigns.route) {
-                    CampaignsScreen(campVm)
-                }
-                composable("users") {
-                    UserScreen()
-                }
+                composable(Tab.Dashboard.route) { DashboardScreen(dashVm, usersVm) }
+                composable(Tab.Chat.route) { ChatScreen(chatVm) }
+                composable(Tab.CRM.route) { CRMScreen(crmVm) }
+                composable(Tab.Campaigns.route) { CampaignsScreen(campVm) }
             }
-                InAppNotificationHost(flow = notifVm.notifications)
-
+            InAppNotificationHost(flow = notifVm.notifications)
             if (showSheet) {
                 NotificationCenterSheet(
                     notifications = notifVm.notifications,
@@ -99,6 +95,5 @@ private fun Shell() {
                 )
             }
         }
-
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,17 +36,38 @@ import br.com.fiap.challengewtcc.Tab
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun GradientHeader(title: String, badgeCount: Int, onNotifications: () -> Unit) {
-    val gradient = Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))
+fun GradientHeader(
+    title: String,
+    badgeCount: Int,
+    onNotifications: () -> Unit,
+    onLogout: (() -> Unit)? = null
+) {
+    val gradient = Brush.horizontalGradient(
+        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(gradient)
+            .statusBarsPadding() // 👈 garante espaço seguro no topo
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, style = MaterialTheme.typography.titleLarge.copy(color = Color.White, fontWeight = FontWeight.Bold))
+        Text(
+            title,
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        )
         Spacer(Modifier.weight(1f))
+        onLogout?.let {
+            TextButton(onClick = it) {
+                Text("Sair", color = Color.White)
+            }
+            Spacer(Modifier.width(8.dp))
+        }
         BadgedBox(badge = { if (badgeCount > 0) Badge { Text("$badgeCount") } }) {
             IconButton(onClick = onNotifications) {
                 Icon(Icons.Default.Campaign, tint = Color.White, contentDescription = null)
@@ -124,14 +146,25 @@ fun ScaffoldApp(
     notifications: Flow<Int>,
     onNotificationClick: () -> Unit,
     navController: NavHostController,
+    onLogout: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val count by notifications.collectAsState(initial = 0)
     Scaffold(
-        topBar = { GradientHeader(title = "WTC Association", badgeCount = count, onNotifications = onNotificationClick) },
+        topBar = {
+            GradientHeader(
+                title = "WTC Association",
+                badgeCount = count,
+                onNotifications = onNotificationClick,
+                onLogout = onLogout
+            )
+        },
         bottomBar = { BottomBar(navController) }
-    ) { inner -> Box(Modifier.padding(inner)) { content() } }
+    ) { inner ->
+        Box(Modifier.padding(inner)) { content() }
+    }
 }
+
 
 @Composable
 fun BottomBar(navController: NavHostController) {

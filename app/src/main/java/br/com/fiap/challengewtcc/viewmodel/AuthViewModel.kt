@@ -28,4 +28,8 @@ class AuthViewModel: ViewModel() {
         val ok = MockRepository.login(email, password)
         _state.value = _state.value.copy(loading = false, loggedIn = ok)
     }
+
+    fun logout() {
+        _state.value = AuthState() // limpa o estado do login
+    }
 }
