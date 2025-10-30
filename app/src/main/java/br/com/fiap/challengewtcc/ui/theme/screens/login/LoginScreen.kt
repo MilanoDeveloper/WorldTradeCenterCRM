@@ -111,11 +111,38 @@ fun LoginScreen(
                     }
                 }
 
+                var errorMessage by remember { mutableStateOf<String?>(null) }
+
                 GradientButton(
                     text = if (uiState.loading) "Entrando..." else "Entrar",
                     enabled = !uiState.loading,
-                    onClick = { onLogin(email, password) }
+                    onClick = {
+                        when {
+                            email.isBlank() || password.isBlank() -> {
+                                errorMessage = "Preencha todos os campos."
+                            }
+                            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                                errorMessage = "E-mail inválido. Ex: usuario@exemplo.com"
+                            }
+                            password.length < 6 -> {
+                                errorMessage = "A senha deve ter pelo menos 6 caracteres."
+                            }
+                            else -> {
+                                errorMessage = null
+                                onLogin(email, password)
+                            }
+                        }
+                    }
                 )
+
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
 
                 if (uiState.error != null) {
                     Text(uiState.error ?: "", color = MaterialTheme.colorScheme.error)
