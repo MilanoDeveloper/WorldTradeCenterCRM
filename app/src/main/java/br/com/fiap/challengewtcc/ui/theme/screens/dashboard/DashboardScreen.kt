@@ -17,7 +17,7 @@ fun DashboardScreen(vm: DashboardViewModel, usersVm: UserViewModel) {
     val user = vm.user.collectAsState(null).value
     val summary = vm.summary.collectAsState(initial = "").value
     Column(Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Olá, ${user?.name ?: "Convidado"}", style = MaterialTheme.typography.headlineSmall)
+        Text("Bem-vindo!", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(12.dp))
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             StatCard("Notificações", summary)

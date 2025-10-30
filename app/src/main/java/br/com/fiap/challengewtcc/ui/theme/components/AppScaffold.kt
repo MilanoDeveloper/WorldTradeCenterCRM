@@ -146,23 +146,15 @@ fun ScaffoldApp(
     notifications: Flow<Int>,
     onNotificationClick: () -> Unit,
     navController: NavHostController,
+    visibleTabs: List<Tab>,
     onLogout: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    val count by notifications.collectAsState(initial = 0)
+    val count = notifications.collectAsState(initial = 0).value
     Scaffold(
-        topBar = {
-            GradientHeader(
-                title = "WTC Association",
-                badgeCount = count,
-                onNotifications = onNotificationClick,
-                onLogout = onLogout
-            )
-        },
-        bottomBar = { BottomBar(navController) }
-    ) { inner ->
-        Box(Modifier.padding(inner)) { content() }
-    }
+        topBar = { GradientHeader(title = "WTC Association", badgeCount = count, onNotifications = onNotificationClick, onLogout = onLogout) },
+        bottomBar = { BottomBar(navController = navController, visibleTabs = visibleTabs) }
+    ) { inner -> Box(Modifier.padding(inner)) { content() } }
 }
 
 
