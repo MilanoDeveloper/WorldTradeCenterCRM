@@ -13,6 +13,7 @@ import br.com.fiap.challengewtcc.ui.theme.screens.chat.ChatScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.crm.CRMScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.dashboard.DashboardScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.login.LoginScreen
+import br.com.fiap.challengewtcc.ui.theme.screens.users.UserScreen
 import br.com.fiap.challengewtcc.viewmodel.*
 
 sealed class Screen(val route: String) {
@@ -53,15 +54,17 @@ private fun Shell() {
     val crmVm: CRMViewModel = viewModel()
     val campVm: CampaignViewModel = viewModel()
     val dashVm: DashboardViewModel = viewModel()
+    val usersVm: UserViewModel = viewModel()
 
     ScaffoldApp(
         notifications = notifVm.notificationsCount,
         onNotificationClick = { /* poderia abrir uma sheet */ },
         navController = tabNav
+
     ) {
         NavHost(tabNav, startDestination = Tab.Dashboard.route) {
             composable(Tab.Dashboard.route) {
-                DashboardScreen(dashVm)
+                DashboardScreen(dashVm, usersVm)
             }
             composable(Tab.Chat.route) {
                 ChatScreen(chatVm)
@@ -72,6 +75,9 @@ private fun Shell() {
             composable(Tab.Campaigns.route) {
                 CampaignsScreen(campVm)
             }
+            composable("users") { UserScreen()
+            }
+
         }
     }
 }
