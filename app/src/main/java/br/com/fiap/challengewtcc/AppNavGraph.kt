@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -11,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.fiap.challengewtcc.ui.theme.components.InAppNotificationHost
+import br.com.fiap.challengewtcc.ui.theme.components.NotificationCenterSheet
 import br.com.fiap.challengewtcc.ui.theme.components.ScaffoldApp
 import br.com.fiap.challengewtcc.ui.theme.screens.campaings.CampaignsScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.chat.ChatScreen
@@ -58,10 +63,11 @@ private fun Shell() {
     val campVm: CampaignViewModel = viewModel()
     val dashVm: DashboardViewModel = viewModel()
     val usersVm: UserViewModel = viewModel()
+    var showSheet by remember { mutableStateOf(false) }
 
     ScaffoldApp(
         notifications = notifVm.notificationsCount,
-        onNotificationClick = { /* poderia abrir uma sheet */ },
+        onNotificationClick = { showSheet = true },
         navController = tabNav
 
     ) {
@@ -84,6 +90,15 @@ private fun Shell() {
                 }
             }
                 InAppNotificationHost(flow = notifVm.notifications)
+
+            if (showSheet) {
+                NotificationCenterSheet(
+                    notifications = notifVm.notifications,
+                    onMarkAllRead = { notifVm.markAllRead() },
+                    onDismiss = { showSheet = false }
+                )
+            }
         }
+
     }
 }

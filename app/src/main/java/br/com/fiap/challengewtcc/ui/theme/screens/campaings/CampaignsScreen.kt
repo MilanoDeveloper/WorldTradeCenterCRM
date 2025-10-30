@@ -61,8 +61,8 @@ fun CampaignsScreen(vm: CampaignViewModel) {
                 .fillMaxSize()
                 .padding(inner)
                 .padding(horizontal = 16.dp, vertical = 2.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 80.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            contentPadding = PaddingValues(bottom = 50.dp)
         ) {
             item {
                 Text("Tipo de Campanha", style = MaterialTheme.typography.titleMedium)
