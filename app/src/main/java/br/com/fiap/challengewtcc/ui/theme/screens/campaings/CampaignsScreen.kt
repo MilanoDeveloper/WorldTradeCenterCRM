@@ -30,18 +30,28 @@ fun CampaignsScreen(vm: CampaignViewModel) {
         bottomBar = {
             BottomAppBar {
                 Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("${recipients.size}", style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.width(6.dp))
-                        Text("clientes serão notificados", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Spacer(Modifier.width(2.dp))
+                        Text("clientes serão notificados")
                     }
-                    Button(onClick = { vm.send() }, enabled = canSend) { Text("Enviar Campanha") }
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
+
+                    Button(
+                        onClick = {
+                            val (title, body) = vm.send()
+                            if (br.com.fiap.challengewtcc.notifications.canPostNotifications(ctx)) {
+                                try {
+                                    br.com.fiap.challengewtcc.notifications.LocalNotifier.notify(ctx, title, body)
+                                } catch (_: SecurityException) { }
+                            }
+                        },
+                        enabled = message.isNotBlank()
+                    ) { Text("Enviar Campanha") }
                 }
             }
         }
@@ -119,4 +129,6 @@ private fun SegmentRadioRow(text: String, selected: Boolean, count: Int, onSelec
         Text(text, modifier = Modifier.weight(1f))
         Text("$count clientes", color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
+
+
 }

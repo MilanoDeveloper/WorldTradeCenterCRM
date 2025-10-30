@@ -1,12 +1,16 @@
 package br.com.fiap.challengewtcc
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import br.com.fiap.challengewtcc.ui.theme.components.InAppNotificationHost
 import br.com.fiap.challengewtcc.ui.theme.components.ScaffoldApp
 import br.com.fiap.challengewtcc.ui.theme.screens.campaings.CampaignsScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.chat.ChatScreen
@@ -18,7 +22,7 @@ import br.com.fiap.challengewtcc.viewmodel.*
 
 sealed class Screen(val route: String) {
     data object Login: Screen("login")
-    data object Shell: Screen("shell") // container com BottomBar e Header
+    data object Shell: Screen("shell")
 }
 
 sealed class Tab(val route: String) {
@@ -45,7 +49,6 @@ fun AppNavGraph(rootNavController: NavHostController = rememberNavController()) 
     }
 }
 
-// Container com Header + BottomBar + Nav interno das tabs
 @Composable
 private fun Shell() {
     val tabNav = rememberNavController()
@@ -62,22 +65,25 @@ private fun Shell() {
         navController = tabNav
 
     ) {
-        NavHost(tabNav, startDestination = Tab.Dashboard.route) {
-            composable(Tab.Dashboard.route) {
-                DashboardScreen(dashVm, usersVm)
+        Box(Modifier.fillMaxSize()) {
+            NavHost(tabNav, startDestination = Tab.Dashboard.route) {
+                composable(Tab.Dashboard.route) {
+                    DashboardScreen(dashVm, usersVm)
+                }
+                composable(Tab.Chat.route) {
+                    ChatScreen(chatVm)
+                }
+                composable(Tab.CRM.route) {
+                    CRMScreen(crmVm)
+                }
+                composable(Tab.Campaigns.route) {
+                    CampaignsScreen(campVm)
+                }
+                composable("users") {
+                    UserScreen()
+                }
             }
-            composable(Tab.Chat.route) {
-                ChatScreen(chatVm)
-            }
-            composable(Tab.CRM.route) {
-                CRMScreen(crmVm)
-            }
-            composable(Tab.Campaigns.route) {
-                CampaignsScreen(campVm)
-            }
-            composable("users") { UserScreen()
-            }
-
+                InAppNotificationHost(flow = notifVm.notifications)
         }
     }
 }

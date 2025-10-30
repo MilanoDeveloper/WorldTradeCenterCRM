@@ -44,16 +44,19 @@ class CampaignViewModel : ViewModel() {
         )
     }.stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.Eagerly, emptyMap())
 
+
+
     fun setType(t: CampaignType) { _type.value = t }
     fun setSegment(s: ClientSegment) { _segment.value = s }
     fun setMessage(text: String) { _message.value = text }
     fun applyTemplate() { _message.value = _type.value.template() }
 
-    fun send(): Int {
+    fun send(): Pair<String, String> {
         val qty = recipients.value.size
         val title = "${_type.value.emoji()} Campanha enviada"
-        val body = "Destinatários: $qty"
-        MockRepository.pushNotification(AppNotification(UUID.randomUUID().toString(), title, body, false))
-        return qty
+        val preview = _message.value.take(90)
+        val body = "Destinatários: $qty • $preview"
+        MockRepository.pushNotification(AppNotification(java.util.UUID.randomUUID().toString(), title, body, false))
+        return title to body
     }
 }
