@@ -41,24 +41,27 @@ sealed class Tab(val route: String) {
 @Composable
 fun AppNavGraph(rootNavController: NavHostController = rememberNavController()) {
     val authVm: AuthViewModel = viewModel()
+
     NavHost(navController = rootNavController, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {
             LoginScreen(
                 state = authVm.state.collectAsState(),
                 onLogin = { email, pass -> authVm.login(email, pass) },
-                onLoggedIn = { rootNavController.navigate(Screen.Shell.route) { popUpTo(0) } }
+                onLoggedIn = {
+                    rootNavController.navigate(Screen.Shell.route) {
+                        popUpTo(0)
+                    }
+                }
             )
         }
         composable(Screen.Shell.route) {
-            Shell()
+            Shell(rootNav = rootNavController, authVm = authVm) // <-- passa o mesmo VM
         }
     }
 }
 
 @Composable
-private fun Shell() {
-    val rootNav = rememberNavController()
-    val authVm: AuthViewModel = viewModel()
+private fun Shell(rootNav: NavHostController, authVm: AuthViewModel) {
     val tabNav = rememberNavController()
     val notifVm: NotificationViewModel = viewModel()
     val chatVm: ChatViewModel = viewModel()
@@ -74,7 +77,8 @@ private fun Shell() {
         onLogout = {
             authVm.logout()
             rootNav.navigate(Screen.Login.route) {
-                popUpTo(0)
+                popUpTo(Screen.Shell.route) { inclusive = true }
+                launchSingleTop = true
             }
         },
         navController = tabNav
@@ -97,3 +101,4 @@ private fun Shell() {
         }
     }
 }
+
