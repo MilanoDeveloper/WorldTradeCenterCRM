@@ -1,133 +1,144 @@
 package br.com.fiap.challengewtcc.ui.theme.screens.campaings
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import br.com.fiap.challengewtcc.data.CampaignType
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import br.com.fiap.challengewtcc.data.remote.request.CreateCampaignRequest
 import br.com.fiap.challengewtcc.viewmodel.CampaignViewModel
-import br.com.fiap.challengewtcc.viewmodel.ClientSegment
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CampaignsScreen(vm: CampaignViewModel) {
-    val type by vm.type.collectAsState()
-    val segment by vm.segment.collectAsState()
-    val message by vm.message.collectAsState()
-    val counts by vm.counts.collectAsState()
-    val recipients by vm.recipients.collectAsState()
-    val canSend = message.isNotBlank()
+fun CampaignsScreen(
+    viewModel: CampaignViewModel
+) {
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Campanha Personalizada") }) },
-        bottomBar = {
-            BottomAppBar {
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("${recipients.size}", style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.width(2.dp))
-                        Text("clientes serão notificados")
-                    }
-                    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-                    Button(
-                        onClick = {
-                            val (title, body) = vm.send()
-                            if (br.com.fiap.challengewtcc.notifications.canPostNotifications(ctx)) {
-                                try {
-                                    br.com.fiap.challengewtcc.notifications.LocalNotifier.notify(ctx, title, body)
-                                } catch (_: SecurityException) { }
-                            }
-                        },
-                        enabled = message.isNotBlank()
-                    ) { Text("Enviar Campanha") }
-                }
-            }
-        }
-    ) { inner ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(inner)
-                .padding(horizontal = 16.dp, vertical = 2.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-            contentPadding = PaddingValues(bottom = 50.dp)
-        ) {
-            item {
-                Text("Tipo de Campanha", style = MaterialTheme.typography.titleMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(selected = type == CampaignType.PROMOCAO, onClick = { vm.setType(CampaignType.PROMOCAO) }, label = { Text("Promoção") })
-                    FilterChip(selected = type == CampaignType.COMUNICADO, onClick = { vm.setType(CampaignType.COMUNICADO) }, label = { Text("Comunicado") })
-                    FilterChip(selected = type == CampaignType.ALERTA, onClick = { vm.setType(CampaignType.ALERTA) }, label = { Text("Alerta") })
-                    FilterChip(selected = type == CampaignType.BOLETO, onClick = { vm.setType(CampaignType.BOLETO) }, label = { Text("Boleto") })
-                    FilterChip(selected = type == CampaignType.AGRADECIMENTO, onClick = { vm.setType(CampaignType.AGRADECIMENTO) }, label = { Text("Agradecimento") })
-                }
-            }
-
-            item {
-                Text("Segmento de Clientes", style = MaterialTheme.typography.titleMedium)
-            }
-
-            items(listOf(
-                Triple("Todos os Clientes", ClientSegment.TODOS, counts[ClientSegment.TODOS] ?: 0),
-                Triple("Premium", ClientSegment.PREMIUM, counts[ClientSegment.PREMIUM] ?: 0),
-                Triple("Novos", ClientSegment.NOVOS, counts[ClientSegment.NOVOS] ?: 0),
-                Triple("Regular", ClientSegment.REGULAR, counts[ClientSegment.REGULAR] ?: 0),
-                Triple("Recuperação", ClientSegment.RECUPERACAO, counts[ClientSegment.RECUPERACAO] ?: 0)
-            )) { (label, seg, count) ->
-                SegmentRadioRow(
-                    text = label,
-                    selected = segment == seg,
-                    count = count,
-                    onSelect = { vm.setSegment(seg) }
-                )
-            }
-
-            item {
-                Text("Mensagem", style = MaterialTheme.typography.titleMedium)
-                OutlinedTextField(
-                    value = message,
-                    onValueChange = vm::setMessage,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
-                    placeholder = { Text("Digite sua mensagem aqui...") }
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    AssistChip(onClick = { vm.applyTemplate() }, label = { Text("Usar Template") })
-                    Text("${message.length} caracteres", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
-
+    var title by remember {
+        mutableStateOf("")
     }
-}
 
-@Composable
-private fun SegmentRadioRow(text: String, selected: Boolean, count: Int, onSelect: () -> Unit) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .selectable(selected = selected, onClick = onSelect, role = Role.RadioButton)
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+    var description by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadCampaigns()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        RadioButton(selected = selected, onClick = onSelect)
-        Spacer(Modifier.width(8.dp))
-        Text(text, modifier = Modifier.weight(1f))
-        Text("$count clientes", color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        OutlinedTextField(
+            value = title,
+            onValueChange = {
+                title = it
+            },
+            label = {
+                Text("Campaign title")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = {
+                description = it
+            },
+            label = {
+                Text("Description")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+
+            Button(
+                onClick = {
+
+                    viewModel.createCampaign(
+                        CreateCampaignRequest(
+                            title = title,
+                            description = description,
+                            status = "ACTIVE",
+                            targetAudience = "ALL",
+                            startDate = "2026-05-17",
+                            endDate = "2026-12-31"
+                        )
+                    )
+                }
+            ) {
+                Text("Create")
+            }
+
+            TextButton(
+                onClick = {
+                    viewModel.loadCampaigns()
+                }
+            ) {
+                Text("Refresh")
+            }
+        }
+
+        LazyColumn(
+            contentPadding = PaddingValues(top = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+            items(state.campaigns) { campaign ->
+
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text(
+                            text = campaign.title,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Text(
+                            text = campaign.description,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
-
-
 }

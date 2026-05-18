@@ -194,7 +194,12 @@ fun ScaffoldApp(
                 onLogout = onLogout
             )
         },
-        bottomBar = { BottomBar(navController = navController, visibleTabs = visibleTabs) }
+        bottomBar = {
+            BottomBar(
+                navController = navController,
+                visibleTabs = visibleTabs
+            )
+        }
     ) { inner -> Box(Modifier.padding(inner)) { content() } }
 }
 
@@ -226,18 +231,6 @@ fun BottomBar(navController: NavHostController) {
                    },
             label = {
                 Text("Chat")
-            }
-        )
-        NavigationBarItem(
-            selected = route == Tab.CRM.route,
-            onClick = {
-                navController.navigate(Tab.CRM.route)
-            },
-            icon = {
-                Icon(Icons.Default.People, contentDescription = null)
-            },
-            label = {
-                Text("Clientes")
             }
         )
         NavigationBarItem(

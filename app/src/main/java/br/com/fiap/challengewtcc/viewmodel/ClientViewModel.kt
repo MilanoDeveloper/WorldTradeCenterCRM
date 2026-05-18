@@ -2,40 +2,41 @@ package br.com.fiap.challengewtcc.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.fiap.challengewtcc.data.remote.request.CreateCampaignRequest
-import br.com.fiap.challengewtcc.data.remote.response.CampaignResponse
-import br.com.fiap.challengewtcc.data.repository.CampaignRepository
+import br.com.fiap.challengewtcc.data.remote.request.CreateClientRequest
+import br.com.fiap.challengewtcc.data.remote.response.ClientResponse
+import br.com.fiap.challengewtcc.data.repository.ClientRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.onFailure
 
-data class CampaignState(
+data class ClientState(
     val loading: Boolean = false,
-    val campaigns: List<CampaignResponse> = emptyList(),
-    val selectedCampaign: CampaignResponse? = null,
+    val clients: List<ClientResponse> = emptyList(),
+    val selectedClient: ClientResponse? = null,
     val error: String? = null
 )
 
-class CampaignViewModel : ViewModel() {
+class ClientViewModel : ViewModel() {
 
-    private val repository = CampaignRepository()
+    private val repository = ClientRepository()
 
-    private val _state = MutableStateFlow(CampaignState())
-    val state: StateFlow<CampaignState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(ClientState())
+    val state: StateFlow<ClientState> = _state.asStateFlow()
 
-    fun loadCampaigns() {
+    fun loadClients() {
         viewModelScope.launch {
             _state.value = _state.value.copy(
                 loading = true,
                 error = null
             )
 
-            repository.getCampaigns()
-                .onSuccess { campaigns ->
+            repository.getClients()
+                .onSuccess { clients ->
                     _state.value = _state.value.copy(
                         loading = false,
-                        campaigns = campaigns
+                        clients = clients
                     )
                 }
                 .onFailure { exception ->
@@ -47,18 +48,18 @@ class CampaignViewModel : ViewModel() {
         }
     }
 
-    fun loadCampaignById(id: String) {
+    fun loadClientById(id: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(
                 loading = true,
                 error = null
             )
 
-            repository.getCampaignById(id)
-                .onSuccess { campaign ->
+            repository.getClientById(id)
+                .onSuccess { client ->
                     _state.value = _state.value.copy(
                         loading = false,
-                        selectedCampaign = campaign
+                        selectedClient = client
                     )
                 }
                 .onFailure { exception ->
@@ -70,16 +71,16 @@ class CampaignViewModel : ViewModel() {
         }
     }
 
-    fun createCampaign(request: CreateCampaignRequest) {
+    fun createClient(request: CreateClientRequest) {
         viewModelScope.launch {
             _state.value = _state.value.copy(
                 loading = true,
                 error = null
             )
 
-            repository.createCampaign(request)
+            repository.createClient(request)
                 .onSuccess {
-                    loadCampaigns()
+                    loadClients()
                 }
                 .onFailure { exception ->
                     _state.value = _state.value.copy(
