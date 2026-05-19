@@ -143,10 +143,19 @@ private fun Shell(
                     )
                 }
 
-                composable(Tab.Chat.route) {
+                composable(
+                    route = "chat/{otherUserId}"
+                ) { backStackEntry ->
+
+                    val otherUserId =
+                        backStackEntry.arguments
+                            ?.getString("otherUserId")
+                            ?: ""
+
                     ChatScreen(
                         vm = chatVm,
-                        authVm = authVm
+                        authVm = authVm,
+                        otherUserId = otherUserId
                     )
                 }
 
@@ -155,7 +164,11 @@ private fun Shell(
                 }
 
                 composable("users") {
-                    UserScreen()
+                    UserScreen(
+                        onUserClick = { userId ->
+                            tabNav.navigate("chat/$userId")
+                        }
+                    )
                 }
 
                 composable("notifications") {

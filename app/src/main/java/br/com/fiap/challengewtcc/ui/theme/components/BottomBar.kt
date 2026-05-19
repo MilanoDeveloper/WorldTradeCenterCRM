@@ -52,9 +52,10 @@ fun BottomBar(
                 Tab.Chat -> {
 
                     NavigationBarItem(
-                        selected = route == Tab.Chat.route,
+                        selected = route?.startsWith("chat") == true || route == "users",
                         onClick = {
-                            navController.navigate(Tab.Chat.route)
+                            // Se for operador, vai para a lista de usuários primeiro para escolher um cliente
+                            navController.navigate("users")
                         },
                         icon = {
                             Icon(

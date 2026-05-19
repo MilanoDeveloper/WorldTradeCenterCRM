@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import br.com.fiap.challengewtcc.data.remote.request.SendMessageRequest
 import br.com.fiap.challengewtcc.data.remote.response.MessageResponse
 import br.com.fiap.challengewtcc.data.repository.ChatRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 data class ChatState(
@@ -25,8 +27,9 @@ class ChatViewModel : ViewModel() {
     private val repository = ChatRepository()
 
     private val _state = MutableStateFlow(ChatState())
-
     val state: StateFlow<ChatState> = _state.asStateFlow()
+
+    private var pollingJob: Job? = null
 
     fun loadMessages(
         user1: String,
@@ -35,17 +38,21 @@ class ChatViewModel : ViewModel() {
 
         viewModelScope.launch {
 
-            _state.value = _state.value.copy(
-                loading = true,
-                error = null
-            )
+            // Só mostramos o loading se a lista estiver vazia para evitar "piscar" no polling
+            if (_state.value.messages.isEmpty()) {
+                _state.value = _state.value.copy(
+                    loading = true,
+                    error = null
+                )
+            }
 
             repository.getMessages(user1, user2)
                 .onSuccess { messages ->
 
                     _state.value = _state.value.copy(
                         loading = false,
-                        messages = messages
+                        messages = messages,
+                        error = null
                     )
                 }
                 .onFailure { exception ->
@@ -62,10 +69,10 @@ class ChatViewModel : ViewModel() {
         user1: String,
         user2: String
     ) {
+        pollingJob?.cancel()
+        pollingJob = viewModelScope.launch {
 
-        viewModelScope.launch {
-
-            while (true) {
+            while (isActive) {
 
                 loadMessages(user1, user2)
 

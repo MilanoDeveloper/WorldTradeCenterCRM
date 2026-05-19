@@ -20,30 +20,19 @@ class UserViewModel : ViewModel() {
     val error: StateFlow<String?> = _error
 
     fun loadUsers() {
-
         viewModelScope.launch {
-
             try {
-
                 _loading.value = true
-
                 val response = ApiClient.clientService.getClients()
-
                 if (response.isSuccessful) {
-
                     _users.value = response.body() ?: emptyList()
-
+                    _error.value = null
                 } else {
-
-                    _error.value = response.message()
+                    _error.value = "Erro ao carregar usuários: ${response.code()}"
                 }
-
             } catch (e: Exception) {
-
                 _error.value = e.message
-
             } finally {
-
                 _loading.value = false
             }
         }
