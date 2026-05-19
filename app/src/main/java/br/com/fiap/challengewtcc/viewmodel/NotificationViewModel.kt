@@ -1,5 +1,6 @@
 package br.com.fiap.challengewtcc.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.fiap.challengewtcc.data.remote.response.NotificationResponse
@@ -36,26 +37,21 @@ class NotificationViewModel : ViewModel() {
     val error: StateFlow<String?> =
         _error
 
-    fun loadNotifications(
-        userId: String
-    ) {
+    fun loadNotifications(userId: String) {
 
         viewModelScope.launch {
 
-            _loading.value = true
-
-            repository
-                .getNotifications(userId)
+            repository.getNotifications(userId)
                 .onSuccess {
+
+                    Log.d("NOTIFICATION_DEBUG", it.toString())
 
                     _notifications.value = it
                 }
                 .onFailure {
 
-                    _error.value = it.message
+                    Log.e("NOTIFICATION_DEBUG", it.message ?: "erro")
                 }
-
-            _loading.value = false
         }
     }
 

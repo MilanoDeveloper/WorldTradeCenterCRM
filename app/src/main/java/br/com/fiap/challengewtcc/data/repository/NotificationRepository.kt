@@ -1,5 +1,6 @@
 package br.com.fiap.challengewtcc.data.repository
 
+import android.util.Log
 import br.com.fiap.challengewtcc.data.remote.ApiClient
 import br.com.fiap.challengewtcc.data.remote.response.NotificationResponse
 
@@ -11,23 +12,22 @@ class NotificationRepository {
 
         return try {
 
-            val response = ApiClient.notificationService
-                .getNotifications(userId)
+            val response =
+                ApiClient.notificationService.getNotifications(userId)
+
+            Log.d("NOTIFICATION_API", response.body().toString())
 
             if (response.isSuccessful) {
-
-                Result.success(
-                    response.body().orEmpty()
-                )
-
+                Result.success(response.body().orEmpty())
             } else {
-
                 Result.failure(
                     Exception("Erro ao buscar notificações")
                 )
             }
 
         } catch (e: Exception) {
+
+            Log.e("NOTIFICATION_API", e.message ?: "erro")
 
             Result.failure(e)
         }
