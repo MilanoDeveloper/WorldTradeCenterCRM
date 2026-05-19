@@ -17,6 +17,7 @@ import br.com.fiap.challengewtcc.ui.theme.screens.campaings.CampaignsScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.chat.ChatScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.dashboard.DashboardScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.login.LoginScreen
+import br.com.fiap.challengewtcc.ui.theme.screens.login.SignUpScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.notification.NotificationsScreen
 import br.com.fiap.challengewtcc.ui.theme.screens.users.UserScreen
 import br.com.fiap.challengewtcc.viewmodel.AuthViewModel
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
+    data object SignUp : Screen("signup")
     data object Shell : Screen("shell")
 }
 
@@ -63,6 +65,26 @@ fun AppNavGraph(
                 },
                 onRoleChange = { role ->
                     authVm.updateRole(role)
+                },
+                onSignUpClick = {
+                    rootNavController.navigate(Screen.SignUp.route)
+                }
+            )
+        }
+
+        composable(Screen.SignUp.route) {
+            SignUpScreen(
+                state = authVm.state.collectAsState(),
+                onRegister = { name, email, pass ->
+                    authVm.register(name, email, pass)
+                },
+                onBack = {
+                    rootNavController.popBackStack()
+                },
+                onSuccess = {
+                    rootNavController.navigate(Screen.Shell.route) {
+                        popUpTo(0)
+                    }
                 }
             )
         }

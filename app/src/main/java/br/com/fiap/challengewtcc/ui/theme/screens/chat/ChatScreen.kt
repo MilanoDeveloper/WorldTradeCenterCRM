@@ -1,5 +1,6 @@
 package br.com.fiap.challengewtcc.ui.theme.screens.chat
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,11 +36,13 @@ fun ChatScreen(
 
     LaunchedEffect(otherUserId, currentUserId) {
         if (currentUserId.isNotEmpty() && otherUserId.isNotEmpty()) {
+            Log.d("ChatScreen", "Abrindo chat: Eu($currentUserId) com Outro($otherUserId)")
             vm.startPolling(currentUserId, otherUserId)
+        } else {
+            Log.e("ChatScreen", "IDs inválidos: Eu($currentUserId) Outro($otherUserId)")
         }
     }
 
-    // Auto-scroll para o final quando novas mensagens chegam
     LaunchedEffect(state.messages.size) {
         if (state.messages.isNotEmpty()) {
             listState.animateScrollToItem(state.messages.size - 1)
@@ -51,7 +54,6 @@ fun ChatScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Mensagens
         Box(modifier = Modifier.weight(1f)) {
             if (state.loading && state.messages.isEmpty()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -88,7 +90,6 @@ fun ChatScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Input
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()

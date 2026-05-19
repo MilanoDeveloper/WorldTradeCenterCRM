@@ -23,7 +23,8 @@ fun LoginScreen(
     state: State<AuthState>,
     onLogin: (String, String) -> Unit,
     onLoggedIn: () -> Unit,
-    onRoleChange: (UserRole) -> Unit
+    onRoleChange: (UserRole) -> Unit,
+    onSignUpClick: () -> Unit
 ) {
     val uiState = state.value
     var email by remember { mutableStateOf("") }
@@ -146,6 +147,12 @@ fun LoginScreen(
 
                 if (uiState.error != null) {
                     Text(uiState.error ?: "", color = MaterialTheme.colorScheme.error)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextButton(onClick = onSignUpClick) {
+                    Text("Ainda não tem conta? Criar conta")
                 }
             }
         }

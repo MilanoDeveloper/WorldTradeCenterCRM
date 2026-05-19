@@ -1,5 +1,6 @@
 package br.com.fiap.challengewtcc.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.fiap.challengewtcc.data.remote.request.SendMessageRequest
@@ -14,11 +15,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 data class ChatState(
-
     val loading: Boolean = false,
-
     val messages: List<MessageResponse> = emptyList(),
-
     val error: String? = null
 )
 
@@ -35,10 +33,9 @@ class ChatViewModel : ViewModel() {
         user1: String,
         user2: String
     ) {
-
         viewModelScope.launch {
+            Log.d("ChatViewModel", "Carregando mensagens entre $user1 e $user2")
 
-            // Só mostramos o loading se a lista estiver vazia para evitar "piscar" no polling
             if (_state.value.messages.isEmpty()) {
                 _state.value = _state.value.copy(
                     loading = true,
@@ -48,7 +45,7 @@ class ChatViewModel : ViewModel() {
 
             repository.getMessages(user1, user2)
                 .onSuccess { messages ->
-
+                    Log.d("ChatViewModel", "Sucesso! Recebidas ${messages.size} mensagens")
                     _state.value = _state.value.copy(
                         loading = false,
                         messages = messages,
@@ -56,7 +53,7 @@ class ChatViewModel : ViewModel() {
                     )
                 }
                 .onFailure { exception ->
-
+                    Log.e("ChatViewModel", "Erro ao carregar mensagens: ${exception.message}")
                     _state.value = _state.value.copy(
                         loading = false,
                         error = exception.message
@@ -69,13 +66,11 @@ class ChatViewModel : ViewModel() {
         user1: String,
         user2: String
     ) {
+        Log.d("ChatViewModel", "Iniciando polling para $user1 e $user2")
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch {
-
             while (isActive) {
-
                 loadMessages(user1, user2)
-
                 delay(3000)
             }
         }
@@ -86,9 +81,8 @@ class ChatViewModel : ViewModel() {
         receiverId: String,
         content: String
     ) {
-
         viewModelScope.launch {
-
+            Log.d("ChatViewModel", "Enviando mensagem: $content")
             repository.sendMessage(
                 SendMessageRequest(
                     senderId = senderId,
@@ -96,9 +90,16 @@ class ChatViewModel : ViewModel() {
                     content = content
                 )
             ).onSuccess {
-
+                Log.d("ChatViewModel", "Mensagem enviada com sucesso!")
                 loadMessages(senderId, receiverId)
+            }.onFailure {
+                Log.e("ChatViewModel", "Erro ao enviar mensagem: ${it.message}")
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pollingJob?.cancel()
     }
 }

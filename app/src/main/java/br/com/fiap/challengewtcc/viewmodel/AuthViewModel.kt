@@ -72,6 +72,35 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun register(name: String, email: String, password: String) {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                loading = true,
+                error = null
+            )
+
+            repository.register(name, email, password)
+                .onSuccess { response ->
+                    _state.value = _state.value.copy(
+                        loading = false,
+                        loggedIn = true,
+                        token = response.token,
+                        userId = response.user.id,
+                        userName = response.user.name,
+                        role = response.user.role
+                    )
+                    SessionManager.token = response.token
+                }
+                .onFailure { exception ->
+                    _state.value = _state.value.copy(
+                        loading = false,
+                        loggedIn = false,
+                        error = exception.message
+                    )
+                }
+        }
+    }
+
     fun logout() {
         _state.value = AuthState()
     }
