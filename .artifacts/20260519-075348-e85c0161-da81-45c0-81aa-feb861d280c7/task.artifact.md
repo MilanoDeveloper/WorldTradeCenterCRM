@@ -1,0 +1,16 @@
+- [x] Fix compilation errors in `AppNavGraph.kt`
+- [x] Implement `ChatScreen` in `ChatScreen.kt`
+- [x] Fix `ChatViewModel` polling logic
+- [x] Cleanup duplicate `BottomBar` in `AppScaffold.kt`
+- [x] Add navigation to chat in `UserScreen.kt`
+- [x] Update `AppNavGraph.kt` and `BottomBar.kt` for better navigation flow
+- [x] Verify build and logic
+- [x] Fix infinite loading in Chat
+	- [x] Optimize `ChatViewModel` loading state
+	- [x] Improve `ChatScreen` scroll and loading UI
+- [x] Final verification with Backend context
+- [x] Data Populating and UI Polish
+	- [x] Add "Empty State" to `ChatScreen.kt`
+	- [x] Implement automatic `DatabaseSeeder` in Backend
+	- [x] Clean up "Seed" button logic in Android
+- [x] Final verification with Backend context
