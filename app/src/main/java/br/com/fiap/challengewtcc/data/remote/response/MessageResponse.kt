@@ -14,8 +14,6 @@ data class MessageResponse(
 
     val content: String? = null,
 
-    val message: String? = null,
-
     val createdAt: String? = null,
 
     val status: String? = null

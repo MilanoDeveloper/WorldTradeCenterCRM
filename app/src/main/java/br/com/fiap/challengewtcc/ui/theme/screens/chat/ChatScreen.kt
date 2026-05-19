@@ -33,10 +33,18 @@ fun ChatScreen(
 
     LaunchedEffect(Unit) {
 
-        vm.loadMessages(
-            authState.userId ?: "",
-            operatorId
-        )
+        authState.userId?.let { userId ->
+
+            vm.loadMessages(
+                userId,
+                operatorId
+            )
+
+            vm.startPolling(
+                userId,
+                operatorId
+            )
+        }
     }
 
     Column(
@@ -62,23 +70,25 @@ fun ChatScreen(
                         modifier = Modifier.padding(12.dp)
                     ) {
 
-                        message.senderName?.let {
-                            Text(
-                                text = it
-                            )
-                        }
+                        Text(
+                            text = message.senderName ?: "Usuário"
+                        )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(
+                            modifier = Modifier.height(4.dp)
+                        )
 
-                        message.content?.let { Text(text = it) }
+                        Text(
+                            text = message.content ?: ""
+                        )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(
+                            modifier = Modifier.height(4.dp)
+                        )
 
-                        message.status?.let {
-                            Text(
-                                text = it
-                            )
-                        }
+                        Text(
+                            text = message.status ?: ""
+                        )
                     }
                 }
             }
@@ -98,15 +108,20 @@ fun ChatScreen(
                 modifier = Modifier.weight(1f)
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
 
             Button(
                 onClick = {
 
-                    if (messageText.isNotBlank()) {
+                    if (
+                        messageText.isNotBlank() &&
+                        authState.userId != null
+                    ) {
 
                         vm.sendMessage(
-                            senderId = authState.userId ?: "",
+                            senderId = authState.userId!!,
                             receiverId = operatorId,
                             content = messageText
                         )
@@ -115,6 +130,7 @@ fun ChatScreen(
                     }
                 }
             ) {
+
                 Text("Enviar")
             }
         }
