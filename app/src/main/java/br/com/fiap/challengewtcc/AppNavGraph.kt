@@ -144,7 +144,10 @@ private fun Shell(
                 }
 
                 composable(Tab.Chat.route) {
-                    ChatScreen(chatVm)
+                    ChatScreen(
+                        vm = chatVm,
+                        authVm = authVm
+                    )
                 }
 
                 composable(Tab.Campaigns.route) {

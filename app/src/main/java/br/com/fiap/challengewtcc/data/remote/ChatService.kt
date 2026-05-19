@@ -1,27 +1,23 @@
 package br.com.fiap.challengewtcc.data.remote
 
 import br.com.fiap.challengewtcc.data.remote.request.SendMessageRequest
-import br.com.fiap.challengewtcc.data.remote.response.ChatConversationResponse
-import br.com.fiap.challengewtcc.data.remote.response.ChatMessageResponse
+import br.com.fiap.challengewtcc.data.remote.response.MessageResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ChatService {
 
-    @GET("chat/conversations")
-    suspend fun getConversations(): Response<List<ChatConversationResponse>>
-
-    @GET("chat/conversations/{id}/messages")
+    @GET("messages")
     suspend fun getMessages(
-        @Path("id") conversationId: String
-    ): Response<List<ChatMessageResponse>>
+        @Query("user1") user1: String,
+        @Query("user2") user2: String
+    ): Response<List<MessageResponse>>
 
-    @POST("chat/conversations/{id}/messages")
+    @POST("messages")
     suspend fun sendMessage(
-        @Path("id") conversationId: String,
         @Body request: SendMessageRequest
-    ): Response<ChatMessageResponse>
+    ): Response<MessageResponse>
 }
