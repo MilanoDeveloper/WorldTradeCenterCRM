@@ -2,16 +2,17 @@ package br.com.fiap.challengewtcc.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.com.fiap.challengewtcc.data.UserRole
 import br.com.fiap.challengewtcc.data.remote.ApiClient
-import br.com.fiap.challengewtcc.data.remote.response.ClientResponse
+import br.com.fiap.challengewtcc.data.remote.response.AuthUserResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserViewModel : ViewModel() {
 
-    private val _users = MutableStateFlow<List<ClientResponse>>(emptyList())
-    val users: StateFlow<List<ClientResponse>> = _users
+    private val _users = MutableStateFlow<List<AuthUserResponse>>(emptyList())
+    val users: StateFlow<List<AuthUserResponse>> = _users
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
@@ -19,13 +20,23 @@ class UserViewModel : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    fun loadUsers() {
+    fun loadUsers(currentUserRole: UserRole) {
         viewModelScope.launch {
             try {
                 _loading.value = true
-                val response = ApiClient.clientService.getClients()
+                val response = ApiClient.userService.getUsers()
                 if (response.isSuccessful) {
-                    _users.value = response.body() ?: emptyList()
+                    val allUsers = response.body() ?: emptyList()
+                    
+                    // Lógica de Isolamento:
+                    // 1. Operador vê apenas CLIENTES
+                    // 2. Cliente vê apenas OPERADORES
+                    _users.value = if (currentUserRole == UserRole.OPERATOR) {
+                        allUsers.filter { it.role == UserRole.CLIENT }
+                    } else {
+                        allUsers.filter { it.role == UserRole.OPERATOR }
+                    }
+                    
                     _error.value = null
                 } else {
                     _error.value = "Erro ao carregar usuários: ${response.code()}"

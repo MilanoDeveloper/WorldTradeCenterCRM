@@ -10,15 +10,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import br.com.fiap.challengewtcc.data.UserRole
 import br.com.fiap.challengewtcc.viewmodel.UserViewModel
 
 @Composable
-fun UsersCard(vm: UserViewModel, maxItems: Int = 5) {
+fun UsersCard(
+    vm: UserViewModel, 
+    currentUserRole: UserRole = UserRole.OPERATOR,
+    maxItems: Int = 5
+) {
     val users by vm.users.collectAsState(initial = emptyList())
     val loading by vm.loading.collectAsState(initial = false)
     val error by vm.error.collectAsState(initial = null)
 
-    LaunchedEffect(Unit) { vm.loadUsers() }
+    LaunchedEffect(currentUserRole) { vm.loadUsers(currentUserRole) }
 
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {

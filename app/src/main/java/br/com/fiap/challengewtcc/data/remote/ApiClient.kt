@@ -42,6 +42,10 @@ object ApiClient {
         retrofit.create(NotificationService::class.java)
     }
 
+    val userService: UserService by lazy {
+        retrofit.create(UserService::class.java)
+    }
+
     val chatService: ChatService by lazy {
         retrofit.create(ChatService::class.java)
     }

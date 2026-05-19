@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import br.com.fiap.challengewtcc.data.UserRole
 import br.com.fiap.challengewtcc.ui.theme.components.UsersCard
 import br.com.fiap.challengewtcc.viewmodel.DashboardViewModel
 import br.com.fiap.challengewtcc.viewmodel.UserViewModel
@@ -18,7 +19,8 @@ import br.com.fiap.challengewtcc.viewmodel.UserViewModel
 @Composable
 fun DashboardScreen(
     vm: DashboardViewModel,
-    usersVm: UserViewModel
+    usersVm: UserViewModel,
+    currentUserRole: UserRole = UserRole.OPERATOR
 ) {
 
     Column(
@@ -39,6 +41,7 @@ fun DashboardScreen(
 
         UsersCard(
             vm = usersVm,
+            currentUserRole = currentUserRole,
             maxItems = 5
         )
     }

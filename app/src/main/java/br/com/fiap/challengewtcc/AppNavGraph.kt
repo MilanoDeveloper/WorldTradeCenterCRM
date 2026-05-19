@@ -139,7 +139,8 @@ private fun Shell(
                 composable(Tab.Dashboard.route) {
                     DashboardScreen(
                         dashVm,
-                        usersVm
+                        usersVm,
+                        currentUserRole = role.role
                     )
                 }
 
@@ -165,6 +166,7 @@ private fun Shell(
 
                 composable("users") {
                     UserScreen(
+                        currentUserRole = role.role,
                         onUserClick = { userId ->
                             tabNav.navigate("chat/$userId")
                         }

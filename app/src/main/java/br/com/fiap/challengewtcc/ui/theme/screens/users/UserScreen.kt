@@ -14,18 +14,27 @@ import br.com.fiap.challengewtcc.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserScreen(onUserClick: (String) -> Unit) {
+fun UserScreen(
+    currentUserRole: br.com.fiap.challengewtcc.data.UserRole,
+    onUserClick: (String) -> Unit
+) {
     val vm: UserViewModel = viewModel()
     val users by vm.users.collectAsState()
     val error by vm.error.collectAsState()
     val loading by vm.loading.collectAsState()
 
-    LaunchedEffect(Unit) {
-        vm.loadUsers()
+    LaunchedEffect(currentUserRole) {
+        vm.loadUsers(currentUserRole)
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Selecione um Cliente para Chat") }) }
+        topBar = { 
+            TopAppBar(
+                title = { 
+                    Text(if (currentUserRole == br.com.fiap.challengewtcc.data.UserRole.OPERATOR) "Selecionar Cliente" else "Falar com Operador") 
+                }
+            ) 
+        }
     ) { inner ->
         Box(
             modifier = Modifier
@@ -41,13 +50,13 @@ fun UserScreen(onUserClick: (String) -> Unit) {
                 ) {
                     Text("Erro: $error", color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(8.dp))
-                    Button(onClick = { vm.loadUsers() }) {
+                    Button(onClick = { vm.loadUsers(currentUserRole) }) {
                         Text("Tentar Novamente")
                     }
                 }
             } else if (users.isEmpty()) {
                 Text(
-                    "Nenhum cliente encontrado.",
+                    if (currentUserRole == br.com.fiap.challengewtcc.data.UserRole.OPERATOR) "Nenhum cliente disponível." else "Nenhum operador disponível.",
                     modifier = Modifier.padding(32.dp).align(Alignment.Center),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge
